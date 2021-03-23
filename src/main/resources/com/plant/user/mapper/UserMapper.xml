@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plant.user.mapper.UserMapper">
+	<!-- 회원가입 -->
+	<insert id="UserReg">
+		insert into
+		users(idx,id,pw,name,addr,tel,birth,email)
+		values(users_seq_idx.nextval,#{id},#{pw},#{name},#{addr},#{tel},#{birth},#{email})
+	</insert>
+
+	<!-- 회원 수정 -->
+	<update id="UserModify">
+		update users set pw=#{pw}, addr=#{addr}, tel=#{tel}
+		where id=#{id}
+	</update>
+
+	<!-- 회원 탈퇴 -->
+	<delete id="UserDelete">
+		delete from users where id=#{id}
+	</delete>
+
+	<!-- 로그인 -->
+	<select id="UserLogin" resultType="com.plant.user.model.UserVO">
+		select A.*,NVL((SELECT TEL
+		FROM DEATHNOTE D WHERE D.TEL = A.TEL),0)AS DT,
+		(select nvl(sum(time),0)
+		as time from useruse where idx=a.idx GROUP by
+		idx) as time from (select
+		* from users where id=#{id} and pw=#{pw}) A
+	</select>
+
+	<!-- 로그인시 입장 시간 갱신 -->
+	<update id="UserLoginTime">
+		update users set logindate=sysdate, loginch='1' where
+		id=#{id}
+	</update>
+
+	<!-- 로그아웃 -->
+	<select id="UserLogout" resultType="java.lang.Integer">
+		select * from users where
+		id=#{id}
+	</select>
+
+	<!-- 로그아웃시 퇴장 시간 갱신 -->
+	<update id="UserLogoutTime">
+		update users set enddate=sysdate,loginch='0' where
+		id=#{id}
+	</update>
+
+	<!-- 특정 회원 검색 -->
+	<select id="UserInfo" resultType="com.plant.user.model.UserVO">
+		select * from users where
+		id=#{id}
+	</select>
+
+
+	<!-- 회원정보 수정 전 id pw 체크 -->
+	<select id="UserModifyPwCheck" parameterType="map"
+		resultType="java.lang.Integer">
+		select count(*) from users where id=#{id} and pw=#{pw}
+	</select>
+	<!-- 회원정보 수정 보여주기 -->
+	<select id="UserModifyForm"
+		resultType="com.plant.user.model.UserVO">
+		select * from users where id=#{id}
+	</select>
+
+	<!-- 아이디 중복체크 Ajax -->
+	<select id="userIdCheck" parameterType="String" resultType="int">
+		select count(*) from users where id=#{id}
+	</select>
+
+	<!-- 회원정보 수정 보여주기 -->
+	<select id="UserIdEmailCheck"
+		resultType="com.plant.user.model.UserVO">
+		select id from users where email=#{email}
+	</select>
+	<!-- pw 이메일 체크 -->
+	<select id="UserPwEmail" resultType="java.lang.Integer">
+		select count(*) from users
+		where id=#{id} and email=#{email}
+	</select>
+	<!-- pw 변경 -->
+	<update id="UserPwChange">
+		update users set pw=#{pw} where id=#{id}
+	</update>
+	<!-- 로그인 체크 -->
+	<select id="UserLoginCheck"
+		resultType="com.plant.user.model.UserVO">
+		select loginCh from users where id=#{id}
+	</select>
+	<!-- 시간체크 -->
+	<select id="UserTimeCheck"
+		resultType="com.plant.user.model.UserTimeVO">
+		select (select time from useruse where idx=a.idx )as time from (select
+		id,idx from users where id =#{id}) A
+	</select>
+	<!-- 시간차감 -->
+	<update id="userTimeUpdate">
+		update useruse set time=time-1 where idx=(select idx
+		from users where
+		id=#{id})
+	</update>
+
+</mapper>

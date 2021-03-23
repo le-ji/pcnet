@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//src/main/java/com/plant/user/controller/UserLoginController.java=UTF-8
+encoding//src/main/java/com/plant/user/service/UserLoginService.java=UTF-8
+encoding//src/main/webapp/WEB-INF/views/user/userReg.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/user/userReg_pro.jsp=UTF-8

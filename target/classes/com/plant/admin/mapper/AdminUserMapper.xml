@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plant.admin.mapper.AdminUserMapper">
+
+<!--전체 회원 체크-->
+
+<select id="AdminUserList" resultType="com.plant.user.model.UserVO">
+select * from (
+	select rownum rnum,idx,id,name,tel,birth,joindate,logindate,enddate
+	from (
+		select idx,id,name,tel,birth,joindate,logindate,enddate
+		from users
+		<!-- 이곳에 조건을 사용한다 -->
+ 		<include refid="search"/>
+		order by idx
+	)
+)
+where rnum between #{startRow} and #{endRow}
+</select>
+<!-- 유저의 카운트 -->
+<select id="AdminUserTot" resultType="java.lang.Integer">
+select count(*) from users 
+</select>
+
+<sql id="search">
+<!-- 검색어가 존재 하는 경우에만 검색을 실행  mybytis 문서 참조-->
+<if test="word != null and word != ''.toString() ">
+ where ( 2 = 1 	<!--형식을 맞추기 위한 false or 연산시, and 연산시에는 true 사용 -->
+   <!-- 2글자 이상인 경우 : String 취급,
+     한 글자인 경우:char 취급 => toString()를 이용해서 문자열로 만듬-->
+   <if test="key == 't'.toString()">
+    <!-- concat(문자열, 문자열) : 2개만 연결,
+      "||" : 문자열 이어 붙이는 연산자 -> concat(a,concat(b,c)) -->
+       or id like '%'||#{word}||'%'
+   </if>
+   <if test="key == 'c'.toString()">
+          or tel like '%'||#{word}||'%'
+   </if>
+   <if test="key == 'w'.toString()">
+          or birth like '%'||#{word}||'%'
+   </if>
+   <if test="key == 'n'.toString()">
+          or name like '%'||#{word}||'%'
+   </if>
+   )
+</if>
+</sql>
+
+
+<!-- 회원 강제 로그아웃 -->
+<update id="AdminUserLogout">
+update users set loginch=0  where idx =#{idx}
+</update>
+</mapper>

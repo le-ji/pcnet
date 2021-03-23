@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plant.admin.mapper.UnknownMapper">
+
+<!-- 비회원 아이디 등록 -->
+<insert id="UnknownIdReg">
+insert into unknown(idx,loginnum) values((select max(idx)+1 as idx from unknown),#{loginnum})
+</insert>
+</mapper>
